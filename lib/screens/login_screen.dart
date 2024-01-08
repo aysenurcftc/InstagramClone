@@ -1,21 +1,50 @@
 
+
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:instacloneapp/resources/auth_methods.dart';
+import 'package:instacloneapp/screens/home_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
+import 'package:instacloneapp/utils/utils.dart';
 
 import '../widgest/text_field_inputs.dart';
 
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailTextEditingController = TextEditingController();
+
   final TextEditingController passwordTextEditingController = TextEditingController();
+
+  bool _isLoading = false;
 
   @override
   void dispose() {
     //super.dispose();
     emailTextEditingController.dispose();
     passwordTextEditingController.dispose();
+  }
+
+  void loginUser() async{
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().loginUser(email: emailTextEditingController.text, password: passwordTextEditingController.text);
+    if(res == 'success'){
+      Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+    }else{
+      showSnackBar(context as BuildContext, res);
+    }
+    setState(() {
+      _isLoading = false;
+    });
+
   }
 
   @override
@@ -49,8 +78,12 @@ class LoginScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24,),
               InkWell(
+                onTap: loginUser,
                 child: Container(
-                  child: const Text("Log in"),
+                  child: _isLoading ?  Center(child: CircularProgressIndicator(
+                    color: primaryColor,
+                  ),)
+                      : const Text("Log in"),
                   width: double.infinity,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -58,12 +91,12 @@ class LoginScreen extends StatelessWidget {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.all(
                         Radius.circular(4),
-                
+
                       ),
                     ),
                     color: blueColor,
                   ),
-                
+
                 ),
               ),
               const SizedBox(height: 12,),

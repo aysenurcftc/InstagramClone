@@ -1,27 +1,33 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:instacloneapp/responsive/mobile_screen_layout.dart';
-import 'package:instacloneapp/responsive/responsive_layout_screen.dart';
-import 'package:instacloneapp/responsive/web_screen_layout.dart';
 import 'package:instacloneapp/screens/login_screen.dart';
 import 'package:instacloneapp/screens/signup_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
+  //await Firebase.initializeApp();
+   try {
+
     if(kIsWeb){
+      print("girdi");
       await Firebase.initializeApp(
-        options: const FirebaseOptions(apiKey: 'AIzaSyCNvBVKKTxTxydUI7HDY-FVHUhKiETzyZU',
+        options: const FirebaseOptions(
+          apiKey: 'AIzaSyCNvBVKKTxTxydUI7HDY-FVHUhKiETzyZU',
+          authDomain: "instaclone-e08b7.firebaseapp.com",
             appId:'1:1005202065412:web:53a681498e4e910bc78d51',
-            messagingSenderId: "1005202065412", projectId:"instaclone-e08b7",
-            storageBucket: "instaclone-e08b7.appspot.com"
+            messagingSenderId: "1005202065412",
+          projectId:'instaclone-e08b7',
+          storageBucket: "instaclone-e08b7.appspot.com",
+
         ),
       );
-    }else{
-      await Firebase.initializeApp();
     }
+      print("girdi");
+      await Firebase.initializeApp().then((value) => print("Firebase initialized"));
+
+
   } catch (e) {
     print('Firebase başlatılırken hata oluştu: $e');
   }
@@ -40,7 +46,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData.dark().copyWith(
         scaffoldBackgroundColor: mobileBackgroundColor,
       ),
-      home: SignupScreen(),
+      home: LoginScreen(),
       //const ResponsiveLayout(webScreenLayout: WebScreenLayout(), mobileScreenLayout: MobileScreenLayout(),),
     );
   }
