@@ -4,7 +4,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instacloneapp/resources/auth_methods.dart';
+import 'package:instacloneapp/responsive/mobile_screen_layout.dart';
+import 'package:instacloneapp/responsive/responsive_layout_screen.dart';
+import 'package:instacloneapp/responsive/web_screen_layout.dart';
 import 'package:instacloneapp/screens/home_screen.dart';
+import 'package:instacloneapp/screens/signup_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
 import 'package:instacloneapp/utils/utils.dart';
 
@@ -37,7 +41,14 @@ class _LoginScreenState extends State<LoginScreen> {
     });
     String res = await AuthMethods().loginUser(email: emailTextEditingController.text, password: passwordTextEditingController.text);
     if(res == 'success'){
-      Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) =>ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(),
+            mobileScreenLayout: MobileScreenLayout()
+        ),
+      ),
+      );
+     // Navigator.of(context as BuildContext).pushReplacement(MaterialPageRoute(builder: (context) => HomeScreen()));
     }else{
       showSnackBar(context as BuildContext, res);
     }
@@ -45,6 +56,10 @@ class _LoginScreenState extends State<LoginScreen> {
       _isLoading = false;
     });
 
+  }
+
+  void navigateToSignup(){
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => SignupScreen()));
   }
 
   @override
@@ -111,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 8),
                     ),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: navigateToSignup,
                     child: Container(
                       child: Text("Sign up",style: TextStyle(
                         fontWeight: FontWeight.bold,

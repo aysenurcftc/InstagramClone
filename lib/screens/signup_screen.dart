@@ -8,6 +8,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:instacloneapp/resources/auth_methods.dart';
+import 'package:instacloneapp/responsive/mobile_screen_layout.dart';
+import 'package:instacloneapp/responsive/responsive_layout_screen.dart';
+import 'package:instacloneapp/responsive/web_screen_layout.dart';
+import 'package:instacloneapp/screens/login_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
 import 'package:instacloneapp/utils/utils.dart';
 
@@ -55,6 +59,7 @@ class _SignupScreenState extends State<SignupScreen> {
       _isLoading = true;
     });
 
+
     // signup user using our authmethodds
     String res = await AuthMethods().signupUser(
         email: emailTextEditingController.text,
@@ -62,6 +67,7 @@ class _SignupScreenState extends State<SignupScreen> {
         username: usernameTextEditingController.text,
         bio: bioTextEditingController.text,
         file: _img!);
+
     // if string returned is sucess, user has been created
     if (res == "success") {
       setState(() {
@@ -75,12 +81,25 @@ class _SignupScreenState extends State<SignupScreen> {
       // show the error
       if (context.mounted) {
         showSnackBar(context, res);
+      }else{
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) =>ResponsiveLayout(
+            webScreenLayout: WebScreenLayout(),
+            mobileScreenLayout: MobileScreenLayout()
+        ),
+            ),
+        );
       }
     }}
 
+
+
+    void navigateToLogin(){
+      Navigator.of(context).push(MaterialPageRoute(builder: (context) => LoginScreen()));
+    }
+
   @override
   Widget build(BuildContext context) {
-
 
 
     return Scaffold(
@@ -95,7 +114,6 @@ class _SignupScreenState extends State<SignupScreen> {
               Flexible(child: Container(),flex: 2,),
               SvgPicture.asset('assets/ic_instagram.svg',color: primaryColor, height: 64,),
               const SizedBox(height: 64,),
-
 
               Stack(
                 children: [
@@ -183,9 +201,9 @@ class _SignupScreenState extends State<SignupScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   GestureDetector(
-                    onTap: (){},
+                    onTap: navigateToLogin,
                     child: Container(
-                      child: Text("Sign up",style: TextStyle(
+                      child: Text("Login",style: TextStyle(
                         fontWeight: FontWeight.bold,
                       ),),
                       padding: const EdgeInsets.symmetric(vertical: 8),
