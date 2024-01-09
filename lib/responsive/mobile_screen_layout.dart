@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:instacloneapp/providers/user_provider.dart';
 import 'package:instacloneapp/utils/colors.dart';
+import 'package:instacloneapp/utils/global_variables.dart';
 import 'package:provider/provider.dart';
 
 class MobileScreenLayout extends StatefulWidget {
@@ -54,13 +55,7 @@ class _MobileScreenLayoutState extends State<MobileScreenLayout> {
 
     return Scaffold(
       body: PageView(
-      children: [
-        Text("hello"),
-        Text("hello"),
-        Text("hello"),
-        Text("hello"),
-        Text("hello"),
-      ],
+      children: homeScreenItems,
         physics: const NeverScrollableScrollPhysics(),
         controller: pageController,
         onPageChanged: onPageChanged,

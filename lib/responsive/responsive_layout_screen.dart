@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:instacloneapp/providers/user_provider.dart';
-import 'package:instacloneapp/utils/dimensions.dart';
+import 'package:instacloneapp/utils/global_variables.dart';
 import 'package:provider/provider.dart';
 
 
