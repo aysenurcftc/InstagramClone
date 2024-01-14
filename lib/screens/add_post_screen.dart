@@ -126,6 +126,7 @@ class _AddPostScreenState extends State<AddPostScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     final UserProvider userProvider = Provider.of<UserProvider>(context);
 
     return _file == null
