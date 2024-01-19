@@ -1,14 +1,64 @@
 
 
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:instacloneapp/models/user.dart';
+import 'package:instacloneapp/resources/firestore_methods.dart';
+import 'package:instacloneapp/screens/comment_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
+import 'package:instacloneapp/utils/utils.dart';
+import 'package:instacloneapp/widgest/like_animation.dart';
+import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
-class PostCard extends StatelessWidget {
-  const PostCard({super.key});
+import '../models/user.dart';
+import '../providers/user_provider.dart';
+
+class PostCard extends StatefulWidget {
+
+  final snap;
+  const PostCard({super.key, required this.snap});
+
+  @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+class _PostCardState extends State<PostCard> {
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    getComments();
+  }
+
+  void getComments() async {
+    try{
+      QuerySnapshot snap = await FirebaseFirestore.instance.collection("posts").doc(widget.snap['postId']).collection("comments").get();
+      commentLen = snap.docs.length;
+    }catch(e){
+      showSnackBar(context, e.toString());
+    }
+
+    setState(() {
+
+    });
+  }
+
+
+
+
+  bool isLikeAnimating = false;
+  int commentLen = 0;
 
   @override
   Widget build(BuildContext context) {
+
+    final User user = Provider.of<UserProvider>(context).getUser;
+
+
     return Container(
       color: mobileBackgroundColor,
       padding: const EdgeInsets.symmetric(
@@ -27,7 +77,7 @@ class PostCard extends StatelessWidget {
                 CircleAvatar(
                   radius: 16,
                   backgroundImage: NetworkImage(
-                    "https://www.arkhesanat.com/dosyalar/2019/04/arkhe-sanat-akademisi-resim-is-ogretmenligi-01.jpg",
+                    widget.snap["profImage"],
                   ),
                 ),
                 Expanded(
@@ -39,7 +89,7 @@ class PostCard extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                            Text("username", style: TextStyle(
+                            Text(widget.snap["username"], style: TextStyle(
                               fontWeight: FontWeight.bold,
 
                             ),)
@@ -56,7 +106,10 @@ class PostCard extends StatelessWidget {
                       children: [
                         "delete"
                       ].map((e) => InkWell(
-                        onTap: (){},
+                        onTap: () async {
+                          FireStoreMethods().deletePost(widget.snap["postId"]);
+                          Navigator.of(context).pop();
+                        },
                         child: Container(
                           padding: EdgeInsets.symmetric(
                             vertical: 12,
@@ -76,22 +129,78 @@ class PostCard extends StatelessWidget {
 
           ),
           //Image Section
-          SizedBox(
-            height: MediaQuery.of(context).size.height*0.35,
-            width: double.infinity,
-            child: Image.network(
-              "https://www.sanathane.art/upload/product/resim-kursu-1-20180809141821-20201004002615.jpg",
-              fit: BoxFit.cover,
-            ),
+          GestureDetector(
+            onDoubleTap: () async {
 
+              await FireStoreMethods().likePost(
+                  widget.snap["postId"],
+                   user.uid,
+                    widget.snap["likes"],
+              );
+
+              setState(() {
+                isLikeAnimating = true;
+              });
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                SizedBox(
+                  height: MediaQuery.of(context).size.height*0.35,
+                  width: double.infinity,
+                  child: Image.network(
+                    widget.snap['postUrl'].toString(),
+                    fit: BoxFit.cover,
+                  ),
+
+                ),
+
+                AnimatedOpacity(
+                  duration: const Duration(milliseconds: 200),
+                  opacity: isLikeAnimating ? 1 : 0,
+                  child: LikeAnimation(child: Icon(Icons.favorite, color: Colors.white, size: 100,),
+                      isAnimating: isLikeAnimating,
+                    duration: const Duration(
+                      milliseconds: 400
+                    ),
+                    onEnd : () {
+                        setState(() {
+                          isLikeAnimating = false;
+                        });
+                     }, smallLike: false,
+                  ),
+                )
+            ]
+            ),
           ),
 
           //Like comment section
           Row(
             children: [
-              IconButton(onPressed: (){}, icon: Icon(Icons.favorite, color: Colors.red,)),
-              IconButton(onPressed: (){}, icon: Icon(Icons.comment_outlined,)),
-              IconButton(onPressed: (){}, icon: Icon(Icons.send,)),
+              LikeAnimation(
+                isAnimating: widget.snap['likes'].contains(user.uid),
+                smallLike: true,
+                child: IconButton(
+                  icon: widget.snap['likes'].contains(user.uid)
+                      ? const Icon(
+                    Icons.favorite,
+                    color: Colors.red,
+                  )
+                      : const Icon(
+                    Icons.favorite_border,
+                  ),
+                  onPressed: () => FireStoreMethods().likePost(
+                    widget.snap['postId'].toString(),
+                    user.uid,
+                    widget.snap['likes'],
+                  ),
+                ),),
+              IconButton(onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => CommentsScreen(
+                snap: widget.snap,
+              ))),
+                  icon: Icon(Icons.comment_outlined,)),
+              IconButton(onPressed: (){},
+                  icon: Icon(Icons.send,)),
 
               Expanded(
                 child: Align(
@@ -118,7 +227,7 @@ class PostCard extends StatelessWidget {
                     DefaultTextStyle(
                       style: Theme.of(context).textTheme.subtitle2!.copyWith(fontWeight: FontWeight.bold),
                       child: Text(
-                        "1.455 likes",
+                        "${widget.snap['likes'].length} likes",
                         style: Theme.of(context).textTheme.bodyText2,
                       ),
                     ),
@@ -131,11 +240,11 @@ class PostCard extends StatelessWidget {
                       style: TextStyle(color: primaryColor),
                       children: [
                         TextSpan(
-                          text: "username",
+                          text: widget.snap["username"],
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         TextSpan(
-                          text: "this is description",
+                          text: "  ${widget.snap["description"]}",
                         )
                       ]
                     ),
@@ -145,7 +254,7 @@ class PostCard extends StatelessWidget {
                   onTap: (){},
                   child: Container(
                     padding: EdgeInsets.symmetric(vertical: 4),
-                    child: Text("view all 200 comments", style: TextStyle(
+                    child: Text("view all $commentLen comments", style: TextStyle(
                       fontSize: 16,
                       color: secondaryColor,
                     ),),
@@ -153,7 +262,7 @@ class PostCard extends StatelessWidget {
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(vertical: 4),
-                  child: Text("15/01/2024", style: TextStyle(
+                  child: Text(DateFormat.yMMMd().format(widget.snap['datePublished'].toDate()), style: TextStyle(
                     fontSize: 16,
                     color: secondaryColor,
                   ),),

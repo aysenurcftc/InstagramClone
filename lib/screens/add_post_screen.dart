@@ -10,15 +10,9 @@ import 'package:provider/provider.dart';
 
 class AddPostScreen extends StatefulWidget {
   const AddPostScreen({super.key});
-
-
-
-
   @override
   State<AddPostScreen> createState() => _AddPostScreenState();
 }
-
-
 
 
 class _AddPostScreenState extends State<AddPostScreen> {
@@ -66,7 +60,6 @@ class _AddPostScreenState extends State<AddPostScreen> {
       },
     );
   }
-
 
   void postImage(String uid, String username, String profImage) async {
     setState(() {
