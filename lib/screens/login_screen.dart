@@ -7,9 +7,9 @@ import 'package:instacloneapp/resources/auth_methods.dart';
 import 'package:instacloneapp/responsive/mobile_screen_layout.dart';
 import 'package:instacloneapp/responsive/responsive_layout_screen.dart';
 import 'package:instacloneapp/responsive/web_screen_layout.dart';
-import 'package:instacloneapp/screens/home_screen.dart';
 import 'package:instacloneapp/screens/signup_screen.dart';
 import 'package:instacloneapp/utils/colors.dart';
+import 'package:instacloneapp/utils/global_variables.dart';
 import 'package:instacloneapp/utils/utils.dart';
 
 import '../widgest/text_field_inputs.dart';
@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    //super.dispose();
+    super.dispose();
     emailTextEditingController.dispose();
     passwordTextEditingController.dispose();
   }
@@ -70,7 +70,9 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: SafeArea(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 32),
+          padding: MediaQuery.of(context).size.width > webScreenSize ?
+          EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/3)
+              : const EdgeInsets.symmetric(horizontal: 32),
           width: double.infinity,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
